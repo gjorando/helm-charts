@@ -1,0 +1,22 @@
+apiVersion: v2
+name: mastodon
+version: 0.1.0-dev
+kubeVersion: >= 1.30  # FIXME review the functionalities of the chart and update accordingly
+description: Your self-hosted, globally interconnected microblogging community.
+type: application
+keywords:
+  - mastodon
+  - fediverse
+  - activitypub
+  - web
+  - social
+home: https://joinmastodon.org
+sources:
+  - https://github.com/mastodon/helm-charts
+  - https://github.com/mastodon/mastodon
+maintainers:
+  - name: Guillaume Jorandon
+    email: jorandon@gmail.com
+    url: https://tooting.intensifi.es
+icon: https://raw.githubusercontent.com/mastodon/mastodon/main/lib/assets/wordmark.dark.png
+appVersion: "v4.2.11"
