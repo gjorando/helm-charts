@@ -1,5 +1,20 @@
-# Mastodon Helm Charts repository
+# Mastodon Helm Charts
 
-This repository contains the various Helm charts maintained by ~~Mastodon~~ Renn (it's me), who apparently decided they were k8s-savvy enough (after one (1) week of sleepless nights trying to migrate their home infrastructure) to tackle this problem. Anyways, see the [Github project](https://github.com/users/gjorando/projects/1) for the roadmap I have in mind.
+This is the Helm repository that hosts different charts related to the [Mastodon](https://joinmastodon.org/) project.
 
-![Renn is tired in anticipation](sticker.webp "I will remove this at some point (... unless)")
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to Helm's [documentation](https://helm.sh/docs) to get started.
+
+Once Helm has been set up correctly, add the repo as follows:
+
+```
+help repo add mastodon https://gjorando.github.io/helm-charts
+```
+
+If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.  You can then run `helm search repo mastodon` to see the charts.
+
+See the [Github repository](https://github.com/gjorando/helm-charts) for more informations about deploying the charts in this repository. If you are in a rush, the main chart can be installed as followed:
+
+```
+helm install my-mastodon mastodon/mastodon
+```
+
