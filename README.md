@@ -15,6 +15,6 @@ If you had already added this repo earlier, run `helm repo update` to retrieve t
 See the [Github repository](https://github.com/gjorando/helm-charts) for more informations about deploying the charts in this repository. If you are in a rush, the main chart can be installed as followed:
 
 ```
-helm install my-mastodon mastodon/mastodon
+helm upgrade --install my-mastodon mastodon/mastodon
 ```
 
