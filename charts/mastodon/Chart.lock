@@ -2,5 +2,8 @@ dependencies:
 - name: pgo
   repository: oci://registry.developers.crunchydata.com/crunchydata
   version: 5.6.0
-digest: sha256:1f4c9993cd987db27476db75cbafbe9f5aa0a1f565d09a061401298275957e16
-generated: "2024-08-17T13:58:47.648600494-04:00"
+- name: postgrescluster
+  repository: ""
+  version: 5.6.0
+digest: sha256:3680bae7dfd48a2101e8a159d70f05a16f3a85f163097e1cb839d8d3dc2ad82a
+generated: "2024-08-18T00:27:20.303496477-04:00"
