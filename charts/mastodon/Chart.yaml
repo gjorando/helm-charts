@@ -1,7 +1,7 @@
 apiVersion: v2
 name: mastodon
-version: 0.1.0-dev
-kubeVersion: >= 1.30  # FIXME review the functionalities of the chart and update accordingly
+version: "0.1.0-dev"
+kubeVersion: ">= 1.30"  # FIXME review the functionalities of the chart and update accordingly
 description: Your self-hosted, globally interconnected microblogging community.
 type: application
 keywords:
@@ -10,6 +10,16 @@ keywords:
   - activitypub
   - web
   - social
+dependencies:
+  - name: pgo
+    version: "5.6.0"  # We are using exact version matches, because pgo and postgrescluster should have matching versions
+    repository: oci://registry.developers.crunchydata.com/crunchydata
+    tags:
+      - pgo
+  - name: postgrescluster
+    version: "5.6.0"
+    tags:
+      - postgrescluster
 home: https://joinmastodon.org
 sources:
   - https://github.com/mastodon/helm-charts

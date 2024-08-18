@@ -1,0 +1,7 @@
+apiVersion: v2
+name: postgrescluster
+description: A Crungy Data Postgres cluster deployment for Kubernetes
+type: application
+# The version below should match the version on the PostgresCluster CRD
+version: 5.6.0
+appVersion: 5.6.0
