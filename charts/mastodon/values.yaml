@@ -1,3 +1,7 @@
+# name is the name of our mastodon instance
+# name: "mastodon"
+
+# tags enables or disables certain features
 tags:
   # tags.pgo enables the installation of CrunchyData PGO
   pgo: true
@@ -10,6 +14,14 @@ pgo:
   singleNamespace: true
   # pgo.debug is set to false to disable pgo debug logging
   debug: false
+
 # postgrescluster optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials/basic-setup/create-cluster#use-helm-to-create-a-postgres-cluster)
 postgrescluster:
-  postgresVersion: 16
+  # postgrescluster.databaseInitSQL points to a configuration file that bootstraps the database by creating a user schema for the mastodon database (see: https://www.crunchydata.com/blog/be-ready-public-schema-changes-in-postgres-15)
+  databaseInitSQL:
+    name: "postgrescluster-bootstrap-config"
+    key: "bootstrap.sql"
+  users:
+  - name: mastodon
+    databases:
+    - mastodon

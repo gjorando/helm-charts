@@ -1,0 +1,10 @@
+{{- if and .Values.tags.postgrescluster (not (lookup "v1" "ConfigMap" .Release.Namespace .Values.postgrescluster.databaseInitSQL.name)) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgrescluster-bootstrap-config
+data:
+  bootstrap.sql: |
+    \c {{ toYaml (index (index .Values.postgrescluster.users 0).databases 0) }};
+    CREATE SCHEMA {{ toYaml (index .Values.postgrescluster.users 0).name }} AUTHORIZATION {{ toYaml (index .Values.postgrescluster.users 0).name }};
+{{- end }}
