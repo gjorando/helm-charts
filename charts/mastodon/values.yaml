@@ -1,3 +1,9 @@
+# See full documentation: https://github.com/gjorando/helm-charts/blob/main/charts/mastodon/README.md
+
+###########
+# GENERAL #
+###########
+
 # name is the name of our mastodon instance
 # name: "mastodon"
 
@@ -7,6 +13,13 @@ tags:
   pgo: true
   # tags.postgrescluster enables the installation of a PGO Postgres cluster
   postgrescluster: true
+
+# commonLabels sets custom labels that will be present on every object directly created by the release (not the optional dependencies though)  FIXME
+# commonLabels: {}
+
+#########################
+# OPTIONAL DEPENDENCIES #
+#########################
 
 # pgo optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/installation/helm)
 pgo:
@@ -21,6 +34,7 @@ postgrescluster:
   databaseInitSQL:
     name: "postgrescluster-bootstrap-config"
     key: "bootstrap.sql"
+  # users creates a mastodon user and its associated database (you should not create more than one user/one database for the user)
   users:
   - name: mastodon
     databases:
