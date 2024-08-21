@@ -36,8 +36,8 @@ The following table lists the configurable parameters and their default values.
 
 | Parameter  | Description | Default |
 |---|---|---|
+| `commonLabels` |List of additional custom labels that will be applied to every object deployed by the chart (excluding optional dependencies). | `null`  |
 | `name` | Name for the mastodon instance. | Helm release  |
-| `commonLabels` |List of labels that will be applied to every object deployed by the chart (excluding optional dependencies). | `null`  |
 | `tags.pgo` | Whether to enable [PGO](#pgo). | `true`  |
 | `tags.postgrescluster` | Whether to deploy a [Postgres cluster](#pgo). | `true`  |
 
@@ -53,8 +53,8 @@ You should read the [PGO documentation](https://access.crunchydata.com/documenta
 
 | Overridden value | Reason | Override |
 |---|---|---|
-| `singleNamespace` | PGO only watches for the PostgreSQL clusters deployed in the installation namespace.   | `true` |
 | `debug` | Disable debug logging. | `false` |
+| `singleNamespace` | PGO only watches for the PostgreSQL clusters deployed in the installation namespace.   | `true` |
 
 ### Postgres cluster
 
@@ -67,7 +67,7 @@ The following table lists our configuration overrides for the `postgrescluster` 
 | Overridden value | Reason | Override |
 |---|---|---|
 | `databaseInitSQL` | Points to the config key `bootstrap.sql` from the `postgrescluster-bootstrap-config` config map. This script creates [the user schema](https://www.crunchydata.com/blog/be-ready-public-schema-changes-in-postgres-15) for the default user. The config map won't be created if it already exists. As a result, you can override this behaviour by creating a config map with the same name beforehand. Only do this if you know what you are doing. | See [`values.yaml`](values.yaml) |
-| `users` | Creates a single user with the name `mastodon`, owner of the `mastodon` database. If you wish to override this behaviour, you should know that only the first user in the generated YAML will be take into account. Moreover, the first database in the generated YAML for this user will be used. You should not create multiple users, nor should you create more than one database. | See [`values.yaml`](values.yaml) |
+| `users` | Creates a single user with the name `mastodon`, owner of the `mastodon` database. If you wish to override this behaviour, you should know that only the first user in the generated YAML will have their schema created (see databaseInitSQL`). Moreover, the first database in the generated YAML for this user will be used. You should not create multiple users, nor should you create more than one database. | See [`values.yaml`](values.yaml) |
 
 ## Usage
 
