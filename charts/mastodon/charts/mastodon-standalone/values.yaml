@@ -1,0 +1,115 @@
+# See full documentation: https://github.com/gjorando/helm-charts/blob/main/charts/mastodon/charts/mastodon-standalone/README.md
+
+## @section General parameters
+##
+
+## @param image Image parameters for the pods
+image:
+  repository: "ghcr.io/mastodon/mastodon"
+  # Replace with Always if using the latest tag
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion
+  tag: ""
+
+
+## @param imagePullSecrets Secrets for pulling the image from a private registry
+imagePullSecrets: []
+## @param nameOverride Overrides the name of the chart
+nameOverride: ""
+## @param fullnameOverride Overrides the fully qualified app name
+fullnameOverride: ""
+
+## @param serviceAccount Configuration for the service account
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## @param podAnnotations Annotations to add to deployed pods
+podAnnotations: {}
+## @param podLabels Labels to add to deployed pods
+podLabels: {}
+## @param commonLabels Labels to add to all deployed objects
+commonLabels: {}
+
+## @param podSecurityContext Security context to add to deployed pods
+podSecurityContext: {}
+  # fsGroup: 2000
+
+## @param securityContext Security context for the containers
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+
+## @param services Service configuration for Mastodon
+services:
+  web:
+    type: ClusterIP
+    port: 80
+  streaming:
+    type: ClusterIP
+    port: 4000
+
+## @param resources Resources to allocate to the containers
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+
+# @param nodeSelector Node selector for the deployments
+nodeSelector: {}
+
+# @param tolerations Tolerations for the deployments
+tolerations: []
+
+# @param affinity Affinities for the deployments
+affinity: {}
+
+## @section Storage parameters
+##
+
+## @param persistence Options related to data persistence
+## @param persistence.enabled Whether to enable persistence of the app data
+## @param persistence.existingClaims Use existing PVC instead of creating them (each key corresponds to a volume)
+## @param persistence.accessMode Access mode for the persistent volumes
+## @param persistence.storageClassName Storage class name to use instead of the cluster default
+## @param persistence.resources Resources requirements for each claim (each key corresponds to a volume)
+persistence: 
+  enabled: true
+  existingClaims: {}
+    # assets: my-assets-claim
+    # system: my-system-claim
+  accessMode: ReadWriteOnce
+  # storageClassName: my-storage-class
+  resources:
+    assets:
+      requests:
+        storage: 10Gi
+    system:
+      requests:
+        storage: 100Gi
+
+# @param volumes Additional volumes on the deployed pods
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# @param volumeMounts Additional volumeMounts on the containers
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+

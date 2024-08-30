@@ -1,8 +1,12 @@
-{{- if and .Values.tags.postgrescluster (not (lookup "v1" "ConfigMap" .Release.Namespace .Values.postgrescluster.databaseInitSQL.name)) }}
+{{/*
+Install this ConfigMap only if postgrescluster is going to be actually deployed, taking conditions' precedence over tags into account; and if it doesn't already exist
+*/}}
+{{- if and (or .Values.postgrescluster.enabled (and .Values.tags.pgo (not (hasKey .Values.postgrescluster "enabled" )))) (not (lookup "v1" "ConfigMap" .Release.Namespace .Values.postgrescluster.databaseInitSQL.name)) }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgrescluster-bootstrap-config
+  name: {{ .Values.postgrescluster.databaseInitSQL.name | quote }}
   labels: {{ include "mastodon.labels" . | nindent 4 }}
 data:
   bootstrap.sql: |

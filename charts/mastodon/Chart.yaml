@@ -1,26 +1,20 @@
 apiVersion: v2
 name: mastodon
-version: "0.1.0-dev"
-kubeVersion: ">= 1.30"  # FIXME review the functionalities of the chart and update accordingly
-description: Your self-hosted, globally interconnected microblogging community.
 type: application
+version: "0.1.0-dev"  # Should match the version of mastodon-standalone
+appVersion: "v4.2.12"
+kubeVersion: ">= 1.30"  # FIXME review the functionalities of the chart and update accordingly
+description: A fully featured chart for deploying a production-ready Mastodon instance
+icon: https://raw.githubusercontent.com/mastodon/mastodon/main/lib/assets/wordmark.dark.png
 keywords:
   - mastodon
   - fediverse
   - activitypub
   - web
   - social
-dependencies:
-  - name: pgo
-    version: "5.6.0"  # We are using exact version matches, because pgo and postgrescluster should have matching versions
-    repository: oci://registry.developers.crunchydata.com/crunchydata
-    tags:
-      - pgo
-  - name: postgrescluster
-    version: "5.6.0"
-    tags:
-      - postgrescluster
-home: https://joinmastodon.org
+  - postgresql
+  - redis
+  - elasticsearch
 sources:
   - https://github.com/mastodon/helm-charts
   - https://github.com/mastodon/mastodon
@@ -28,5 +22,24 @@ maintainers:
   - name: Guillaume Jorandon
     email: jorandon@gmail.com
     url: https://tooting.intensifi.es
-icon: https://raw.githubusercontent.com/mastodon/mastodon/main/lib/assets/wordmark.dark.png
-appVersion: "v4.2.11"
+dependencies:
+  # Required to match the same version for pgo and postgrescluster
+  - name: pgo
+    version: "5.6.0"
+    repository: oci://registry.developers.crunchydata.com/crunchydata
+    condition: pgo.enabled
+    tags:
+      - pgo
+  - name: postgrescluster
+    version: "5.6.0"
+    condition: postgrescluster.enabled
+    tags:
+      - pgo
+  - name: redis
+    version: "~20.0.0"
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: redis.enabled
+  # Required to match the same version for mastodon and mastodon-standalone
+  - name: mastodon-standalone
+    version: "0.1.0-dev"
+home: https://joinmastodon.org

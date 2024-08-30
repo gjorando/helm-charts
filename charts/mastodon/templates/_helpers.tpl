@@ -67,7 +67,7 @@ Create the name of the service account to use FIXME
 {{/*
 Mastodon database username and database name
 */}}
-{{- define "mastodon.dbUsername" }}
+{{- define "mastodon.dbUsername" -}}
 {{ (index .Values.postgrescluster.users 0).name }}
 {{- end }}
 {{- define "mastodon.dbName" }}

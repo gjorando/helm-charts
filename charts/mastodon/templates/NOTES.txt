@@ -6,3 +6,9 @@ To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
+
+We recommend reading more about configuring your Mastodon instance via the official documentation: https://docs.joinmastodon.org/
+
+Asset precompilation and database migrations should be automatically performed with Kubernetes jobs. However, should you need to execute a command on your instance, you can do so with the following command:
+
+  $ kubectl -n {{ .Release.Namespace }} exec -it deployment/mastodon-web -- <command>

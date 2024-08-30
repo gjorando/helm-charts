@@ -1,0 +1,84 @@
+{{- define "mastodon-standalone.sidekiq.labels" -}}
+app.kubernetes.io/component: sidekiq
+app.kubernetes.io/part-of: rails
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-sidekiq" (include "mastodon-standalone.fullname" .) | quote }}
+  labels:
+    {{- include "mastodon-standalone.labels" . | nindent 4 }}
+    {{- include "mastodon-standalone.sidekiq.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "mastodon-standalone.selectorLabels" . | nindent 6 }}
+      {{- include "mastodon-standalone.sidekiq.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- include "mastodon-standalone.rollingPodAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "mastodon-standalone.labels" . | nindent 8 }}
+        {{- include "mastodon-standalone.sidekiq.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ printf "%s-sidekiq" .Chart.Name | quote }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: {{ include "mastodon-standalone.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - bundle
+        - exec
+        - sidekiq
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /opt/mastodon/tmp/sidekiq_process_has_started_and_will_begin_processing_jobs
+          initialDelaySeconds: 10
+          failureThreshold: 10
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        {{- include "mastodon-standalone.dataVolumeMounts" . | nindent 8 }}
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      volumes:
+      {{- include "mastodon-standalone.dataVolumes" . | nindent 6 }}
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

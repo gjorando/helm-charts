@@ -1,0 +1,22 @@
+apiVersion: v2
+name: mastodon-standalone
+type: application
+version: "0.1.0-dev"  # Should match the version of mastodon
+appVersion: "v4.2.11"
+kubeVersion: ">= 1.30"  # FIXME review the functionalities of the chart and update accordingly
+description: Standalone chart for deploying the core mastodon codebase
+icon: https://raw.githubusercontent.com/mastodon/mastodon/main/lib/assets/wordmark.dark.png
+keywords:
+  - mastodon
+  - fediverse
+  - activitypub
+  - web
+  - social
+sources:
+  - https://github.com/mastodon/helm-charts
+  - https://github.com/mastodon/mastodon
+maintainers:
+  - name: Guillaume Jorandon
+    email: jorandon@gmail.com
+    url: https://tooting.intensifi.es
+home: https://joinmastodon.org

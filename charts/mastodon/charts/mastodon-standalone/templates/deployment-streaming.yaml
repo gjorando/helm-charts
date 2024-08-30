@@ -1,0 +1,90 @@
+{{- define "mastodon-standalone.streaming.labels" -}}
+app.kubernetes.io/component: streaming
+app.kubernetes.io/part-of: node
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-streaming" (include "mastodon-standalone.fullname" .) | quote }}
+  labels:
+    {{- include "mastodon-standalone.labels" . | nindent 4 }}
+    {{- include "mastodon-standalone.streaming.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "mastodon-standalone.selectorLabels" . | nindent 6 }}
+      {{- include "mastodon-standalone.streaming.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- include "mastodon-standalone.rollingPodAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "mastodon-standalone.labels" . | nindent 8 }}
+        {{- include "mastodon-standalone.streaming.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ printf "%s-streaming" .Chart.Name | quote }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: {{ include "mastodon-standalone.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - node
+        - ./streaming
+        ports:
+        - name: streaming
+          containerPort: {{ .Values.services.streaming.port }}
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /api/v1/streaming/health
+            port: streaming
+        readinessProbe:
+          httpGet:
+            path: /api/v1/streaming/health
+            port: streaming
+        startupProbe:
+          httpGet:
+            path: /api/v1/streaming/health
+            port: streaming
+          initialDelaySeconds: 5
+          failureThreshold: 15
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- with .Values.volumeMounts }}
+        volumeMounts:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

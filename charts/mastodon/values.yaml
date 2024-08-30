@@ -1,28 +1,25 @@
 # See full documentation: https://github.com/gjorando/helm-charts/blob/main/charts/mastodon/README.md
 
-###########
-# GENERAL #
-###########
+## @section General parameters
+##
 
-# name is the name of our mastodon instance
-# name: "mastodon"
+nameOverride: ""
+fullnameOverride: ""
 
-# tags enables or disables certain features
+## @param tags.pgo [default: true] Use Crunchy Data PGO for the database
 tags:
-  # tags.pgo enables the installation of CrunchyData PGO
   pgo: true
-  # tags.postgrescluster enables the installation of a PGO Postgres cluster
-  postgrescluster: true
 
-# commonLabels sets custom labels that will be present on every object directly created by the release (not the optional dependencies though)  FIXME
-# commonLabels: {}
+## @param commonLabels Labels to add to all deployed objects (FIXME not on the PostgresCluster though)
+commonLabels: {}
 
-#########################
-# OPTIONAL DEPENDENCIES #
-#########################
+## @section Optional dependencies
+##
 
 # pgo optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/installation/helm)
 pgo:
+  # pgo.enabled enables the deployment of the operator itself
+  # enabled: false
   # pgo.singleNamespace is set to true to only watch the installation namespace
   singleNamespace: true
   # pgo.debug is set to false to disable pgo debug logging
@@ -30,6 +27,8 @@ pgo:
 
 # postgrescluster optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials/basic-setup/create-cluster#use-helm-to-create-a-postgres-cluster)
 postgrescluster:
+  # postgrescluster.enabled enables the deployment of a Postgres cluster using PGO
+  # enabled: false
   # postgrescluster.databaseInitSQL points to a configuration file that bootstraps the database by creating a user schema for the mastodon database (see: https://www.crunchydata.com/blog/be-ready-public-schema-changes-in-postgres-15)
   databaseInitSQL:
     name: "postgrescluster-bootstrap-config"
@@ -39,3 +38,17 @@ postgrescluster:
   - name: mastodon
     databases:
     - mastodon
+
+# redis optional dependency options (see: https://artifacthub.io/packages/helm/bitnami/redis)
+redis:
+  # redis.enabled enables the deployment of a Redis instance
+  # enabled: false
+ 
+  # redis.architecture with the standalone value deploys a simple Redis master stateful set, without any Redis replica stateful sets
+  architecture: standalone
+
+  # redis.auth enables password authentication, using a secret named redis-secret
+  auth:
+    usePassword: true
+    usePasswordFile: true
+    existingSecret: redis-secret
