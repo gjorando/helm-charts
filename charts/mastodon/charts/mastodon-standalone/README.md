@@ -42,7 +42,7 @@ Your `values.yaml` file should at the bare minimum define the keys that are outl
 | `commonLabels` | Custom labels to add to all deployed objects. | Empty |
 | `podSecurityContext` | Security context for the deployed pods. | Empty |
 | `securityContext` | Security context for the pods' containers. | Empty |
-| `services` | Services configuration for Mastodon. Two keys are available, `web` and `streaming`. | `ClusterIP`, on port 80 for `web` and port 4000 for `streaming` |
+| `services` | Services configuration for Mastodon. Two keys are available, `web` and `streaming`. | `ClusterIP`, on port 3000 for `web` and port 4000 for `streaming` |
 | `resources` | Resources to allocate to the containers. | Empty |
 | `nodeSelector` | Node selector for the deployments. | Empty |
 | `tolerations` | Tolerations list for the deployments. | Empty |

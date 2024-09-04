@@ -1,4 +1,5 @@
 {{- if not .Values.persistence.existingClaims.assets -}}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

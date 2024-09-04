@@ -52,7 +52,7 @@ spec:
         - config/puma.rb
         ports:
         - name: http
-          containerPort: {{ .Values.services.web.port }}
+          containerPort: 3000
           protocol: TCP
         livenessProbe:
           httpGet:
