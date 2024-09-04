@@ -129,6 +129,22 @@ smtp:
   #   name: "my-smtp-secret"
   #   key: "mailgun-password"
 
+## @section Networking parameters
+##
+
+## @param networking Options related to ingress networking
+## @param networking.enabled Whether to deploy networking objects
+## @param networking.type Ingress or Gateway API routing
+## @param networking.type.gateway Options applicable to the Gateway API
+## @param networking.type.gateway.parentRefs Parent references for the HTTP routes
+networking:
+  enabled: true
+  type: "gateway"
+  gateway: {}
+    # parentRefs:
+    # - name: "my-gateway"
+    #   namespace: "gateway-operator-ns"
+
 ## @section Storage parameters
 ##
 

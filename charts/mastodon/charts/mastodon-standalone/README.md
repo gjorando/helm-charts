@@ -84,6 +84,16 @@ Your `values.yaml` file should at the bare minimum define the keys that are outl
 | **`smtp.user`** | Login credential for the SMTP server. | Required if `smtp.enabled` is `true` |
 | **`smtp.secretKeyRef`** | A Kubernetes [`SecretKeySelector`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables-1) referring to the secret key that stores the SMTP password. | Required if `smtp.enabled` is `true` |
 
+### Networking
+
+For now, only the Gateway API is supported. No `Gateway` object is deployed, it must instead be refered in the appropriate configuration parameter.
+
+| Parameter  | Description | Default |
+|---|---|---|
+| `networking.enabled`| Enable the deployment of networking objects for ingress traffic. | `true` |
+| _`networking.type`_ | Whether to use the classic [Ingress API](https://kubernetes.io/docs/concepts/services-networking/ingress/) (TODO not supported yet, `ingress`) or the modern [Gateway API](https://kubernetes.io/docs/concepts/services-networking/gateway/) (`gateway`). | `gateway` |
+| **`networking.gateway.parentRefs`** | A Gateway API [`ParentReference`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference) mapping referencing the Gateway to use for the routes. | Required if `networking.type` is `gateway` |
+
 ### Storage
 
 If persistence is enabled, the following volumes can be defined:

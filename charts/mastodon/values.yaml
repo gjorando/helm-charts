@@ -13,6 +13,14 @@ tags:
 ## @param commonLabels Labels to add to all deployed objects (FIXME not on the PostgresCluster though)
 commonLabels: {}
 
+## @section Mastodon dependency
+##
+
+mastodon-standalone:
+  enabled: false
+  localDomain: "k8s-helm-dev.intensifi.es"
+  singleUserMode: true
+
 ## @section Optional dependencies
 ##
 

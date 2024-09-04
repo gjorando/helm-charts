@@ -4,6 +4,7 @@ kind: Service
 metadata:
   name: {{ printf "%s-web" (include "mastodon-standalone.fullname" .) | quote }}
   labels:
+    {{- include "mastodon-standalone.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.services.web.type }}
   ports:
