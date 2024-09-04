@@ -51,4 +51,4 @@ redis:
   auth:
     usePassword: true
     usePasswordFile: true
-    existingSecret: redis-secret
+    existingSecret: "redis-secret"

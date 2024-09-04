@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mastodon-standalone.env.configMapName" . | quote }}
+  labels:
+    {{- include "mastodon-standalone.labels" . | nindent 4 }}
+data:
+  LOCAL_DOMAIN: {{ required "Please set the domain for federation (key: localDomain)" .Values.localDomain | quote }}
+  REDIS_HOST: {{ required "Please provide the Redis instance hostname" .Values.redis.host | quote }}
+  REDIS_PORT: {{ default 6379 .Values.redis.port }}
+  DB_HOST: {{ required "Please provide the database hostname" .Values.postgres.host | quote }}
+  DB_PORT: {{ default 5432 .Values.postgres.port }}
+  DB_USER: {{ default "mastodon" .Values.postgres.user | quote }}
+  DB_NAME: {{ required "Please provide the Postgres database name" .Values.postgres.name | quote }}

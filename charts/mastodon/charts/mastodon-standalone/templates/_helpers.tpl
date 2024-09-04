@@ -43,21 +43,21 @@ Common labels applied to every object
 Common labels, including selector labels, version identifier and helm related labels
 */}}
 {{- define "mastodon-standalone.labels" -}}
-helm.sh/chart: {{ include "mastodon-standalone.chart" . }}
+helm.sh/chart: {{ include "mastodon-standalone.chart" . | quote }}
 {{ include "mastodon-standalone.selectorLabels" . }}
 {{- include "mastodon-standalone.commonLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
 {{- define "mastodon-standalone.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "mastodon-standalone.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/name: {{ include "mastodon-standalone.name" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
 
 {{/*
@@ -89,7 +89,7 @@ Full image path with tag
 {{- end }}
 
 {{/*
-Data volumes
+Data volumes FIXME use a template deployment instead
 */}}
 {{- define "mastodon-standalone.dataVolumes" -}}
 - name: "assets"
@@ -119,6 +119,28 @@ Data volume mounts
 {{- end }}
 
 {{/*
+Environment values for the deployed containers
+*/}}
+{{- define "mastodon-standalone.env.containersSnippet" -}}
+envFrom:
+- configMapRef:
+    name: {{ include "mastodon-standalone.env.configMapName" . | quote }}
+env: 
+{{- if .Values.redis.secretKeyRef }}
+- name: "REDIS_PASSWORD"
+  valueFrom:
+    secretKeyRef:
+      {{- toYaml .Values.redis.secretKeyRef | nindent 6 }}
+{{- end }}
+{{- if .Values.postgres.secretKeyRef }}
+- name: "DB_PASS"
+  valueFrom:
+    secretKeyRef:
+      {{- toYaml .Values.postgres.secretKeyRef | nindent 6 }}
+{{- end }}
+{{- end }}
+
+{{/*
 Names for each persistent volume claim
 */}}
 
@@ -137,3 +159,37 @@ Names for each persistent volume claim
 {{- printf "%s-system-volume" (include "mastodon-standalone.fullname" .) }}
 {{- end }}
 {{- end }}
+
+{{/*
+Name of the environment config map
+*/}}
+{{- define "mastodon-standalone.env.configMapName" -}}
+{{ printf "%s-env" (include "mastodon-standalone.fullname" .)}}
+{{- end }}
+
+{{/*
+Name of the secret
+*/}}
+{{- define "mastodon-standalone.secretName" -}}
+{{- if .Values.existingSecret }}
+{{- .Values.existingSecret }}
+{{- else }}
+{{- printf "%s-secret" (include "mastodon-standalone.fullname" .)}}
+{{- end }}
+{{- end }}
+
+{{/*
+A small helper function to generate an hexadecimal secret of given length.
+
+Process:
+- Generate a random ASCII string of length ceil(targetLength/2) (ie. generate ceil(targetLength/2) random bytes)
+- Display as hexadecimal; as a byte is written with two hexadecimal digits, we have an output of size 2*ceil(targetLength/2).
+- This means that for odd numbers we have one byte excedent. So we just limit the size of our output to $length, and voilà!
+*/}}
+{{- define "mastodon-standalone.randHex" -}}
+{{- $length := . }}
+{{- if or (not (kindIs "int" $length)) (le $length 0) }}
+{{- printf "mastodon-standalone.randHex expects a positive integer (%d passed)" $length | fail }}
+{{- end}}
+{{- printf "%x" (randAscii (divf $length 2 | ceil | int)) | trunc $length }}
+{{- end}}

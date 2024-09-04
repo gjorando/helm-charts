@@ -72,6 +72,7 @@ spec:
         volumeMounts:
           {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- include "mastodon-standalone.env.containersSnippet" . | nindent 8 }}
       {{- with .Values.volumes }}
       volumes:
       {{- toYaml . | nindent 6 }}

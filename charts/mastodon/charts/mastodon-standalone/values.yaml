@@ -11,7 +11,6 @@ image:
   # Overrides the image tag whose default is the chart appVersion
   tag: ""
 
-
 ## @param imagePullSecrets Secrets for pulling the image from a private registry
 imagePullSecrets: []
 ## @param nameOverride Overrides the name of the chart
@@ -75,6 +74,41 @@ tolerations: []
 
 # @param affinity Affinities for the deployments
 affinity: {}
+
+## @section Mastodon configuration
+##
+
+## @param localDomain Domain name (without the protocol) for your instance, used to identify it on the Fediverse (cannot be changed later)
+# localDomain: "example.com"
+
+## @param existingSecret Name of the secret to use for storing the Mastodon secrets (if it doesn't exist it will be created)
+# existingSecret: "my-secret"
+
+## @param redis Redis parameters
+## @param redis.host Redis host
+## @param redis.port Redis port
+## @param redis.secretKeyRef Optional secret storing the password
+redis:
+  # host: "my-redis-instance"
+  port: 6379
+  # secretKeyRef: 
+  #   name: "my-redis-secret"
+  #   key: "redis-password"
+
+## @param postgres Postgres parameters
+## @param postgres.host Postgres host
+## @param postgres.port Postgres port
+## @param postgres.name Database name
+## @param postgres.user Postgres user
+## @param postgres.secretKeyRef Optional secret storing the password
+postgres:
+  # host: "my-postgres-instance"
+  port: 5432
+  # name: "mastodon_production"
+  user: mastodon
+  # secretKeyRef: 
+  #   name: "my-psql-secret"
+  #   key: "postgres-password"
 
 ## @section Storage parameters
 ##

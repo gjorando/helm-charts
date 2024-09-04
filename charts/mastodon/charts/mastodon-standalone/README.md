@@ -24,7 +24,9 @@ helm upgrade --install my-mastodon mastodon/mastodon-standalone -n $NAMESPACE --
 
 The following table lists the configurable parameters and their default values.
 
-### General parameters
+Your `values.yaml` file should at the bare minimum define the keys that are outlined in **bold**. Moreover, check thouroughly the keys that are outlined in _italic_, as they may refer to important configuration. You can find more information on the [Mastodon documentation](https://docs.joinmastodon.org/admin/config/).
+
+### General
 
 | Parameter  | Description | Default |
 |---|---|---|
@@ -32,7 +34,7 @@ The following table lists the configurable parameters and their default values.
 | `imagePullSecrets` | Secrets list for pulling the image from a private registry. | Empty |
 | `nameOverride` | Overrides the name of the chart. | Empty (the default chart name is used) |
 | `fullnameOverride` | Overrides the fully qualified app name | Empty (the chart name is used, if it doesn't contain the release name, it is prefixed) |
-| `serviceAccount` | Configuration map for the service account. It is created if `serviceAccount.create` is `true`. | See [`values.yaml`](values.yaml) |
+| `serviceAccount` | Configuration map for the service account. It is created if `serviceAccount.create` is `true`. If you want to use an existing service account, please specify its name using `serviceAccount.name`. | See [`values.yaml`](values.yaml) |
 | `podAnnotations` | Custom annotations to add to the deployed pods. | Empty |
 | `podLabels` | Custom labels to add to the deployed pods. | Empty |
 | `commonLabels` | Custom labels to add to all deployed objects. | Empty |
@@ -44,7 +46,32 @@ The following table lists the configurable parameters and their default values.
 | `tolerations` | Tolerations list for the deployments. | Empty |
 | `affinity` | Affinities for the deployments. | Empty |
 
-### Storage parameters
+### Mastodon
+
+| Parameter  | Description | Default |
+|---|---|---|
+| **`localDomain`** | Domain name (without the protocol part) of your instance. It is used as a unique identifier on the Fediverse, and cannot be changed once your instance is created. | REQUIRED |
+| _`existingSecret`_ | Mastodon secrets of your instance. The data keys refer to the environment variables in a `env.production` file. See [`secret.yaml`](templates/secret.yaml) for the full list of secrets. | Unset (a new secret is created with generated random values) |
+
+### Redis
+
+| Parameter  | Description | Default |
+|---|---|---|
+| **`redis.host`** | Host for the Redis instance. | Required |
+| `redis.port` | Port for the Redis instance. | `6379` |
+| _`redis.secretKeyRef`_ | A Kubernetes [`SecretKeySelector`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables-1) referring to the secret key that stores the Redis password. | Unset (connection is made without a password) |
+
+### PostgreSQL
+
+| Parameter  | Description | Default |
+|---|---|---|
+| **`postgres.host`** | Host for the PostgreSQL instance. | Required |
+| `postgres.port` | Port for the PostgreSQL instance. | `5432` |
+| **`postgres.name`** | Name of the PostgreSQL db. | Required |
+| `postgres.user` | Name of the PostgreSQL user. | `mastodon` |
+| _`postgres.secretKeyRef`_ | A Kubernetes [`SecretKeySelector`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables-1) referring to the secret key that stores the user password. | Unset (connection is made without a password) |
+
+### Storage
 
 If persistence is enabled, the following volumes can be defined:
 - `assets`: `<mastodon_root_folder>/public/assets`
@@ -52,7 +79,6 @@ If persistence is enabled, the following volumes can be defined:
 
 | Parameter  | Description | Default |
 |---|---|---|
-| `persistence` | Parameters related to data persistence. | See below |
 | `persistence.enabled` | Whether to enable persistence of app data | `true` |
 | `persistence.existingClaims` | Use existing claims instead of having them created by Helm. Each key is a volume, mapping to the name of the existing claim. | Empty |
 | `persistence.accessMode` | Access mode for the claims. | `ReadWriteOnce` |

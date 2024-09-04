@@ -74,3 +74,13 @@ Mastodon database username and database name
 {{ (index (index .Values.postgrescluster.users 0).databases 0) }}
 {{- end }}
 
+{{/*
+Name of the redis secret
+*/}}
+{{- define "mastodon.redisSecretName" -}}
+{{- if .Values.redis.auth.existingSecret }}
+{{- .Values.redis.auth.existingSecret }}
+{{- else }}
+{{- printf "%s-redis-secret" (include "mastodon-standalone.fullname" .)}}
+{{- end }}
+{{- end }}
