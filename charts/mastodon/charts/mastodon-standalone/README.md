@@ -26,6 +26,8 @@ The following table lists the configurable parameters and their default values.
 
 Your `values.yaml` file should at the bare minimum define the keys that are outlined in **bold**. Moreover, check thouroughly the keys that are outlined in _italic_, as they may refer to important configuration. You can find more information on the [Mastodon documentation](https://docs.joinmastodon.org/admin/config/).
 
+**Important note:** secrets are not recreated if they already exist. This ensures that they're not re-generated. Moreover, they're not deleted automatically when the release is uninstalled.
+
 ### General
 
 | Parameter  | Description | Default |
@@ -70,6 +72,17 @@ Your `values.yaml` file should at the bare minimum define the keys that are outl
 | **`postgres.name`** | Name of the PostgreSQL db. | Required |
 | `postgres.user` | Name of the PostgreSQL user. | `mastodon` |
 | _`postgres.secretKeyRef`_ | A Kubernetes [`SecretKeySelector`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables-1) referring to the secret key that stores the user password. | Unset (connection is made without a password) |
+
+### SMTP
+
+| Parameter  | Description | Default |
+|---|---|---|
+| `smtp.enabled` | Enable SMTP configuration for e-mail notifications. | `true` |
+| **`smtp.host`** | SMTP server address. | Required if `smtp.enabled` is `true` |
+| `smtp.port` | SMTP port. | `587` |
+| `smtp.fromAddress` | Address for the from field of e-mails. | Unset (use `notification@<localDomain>`) |
+| **`smtp.user`** | Login credential for the SMTP server. | Required if `smtp.enabled` is `true` |
+| **`smtp.secretKeyRef`** | A Kubernetes [`SecretKeySelector`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables-1) referring to the secret key that stores the SMTP password. | Required if `smtp.enabled` is `true` |
 
 ### Storage
 

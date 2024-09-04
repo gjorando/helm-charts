@@ -138,6 +138,12 @@ env:
     secretKeyRef:
       {{- toYaml .Values.postgres.secretKeyRef | nindent 6 }}
 {{- end }}
+{{- if .Values.smtp.enabled }}
+- name: "SMTP_PASSWORD"
+  valueFrom:
+    secretKeyRef:
+      {{- toYaml (required "Please provide a secret key reference for the SMTP password" .Values.smtp.secretKeyRef) | nindent 6 }}
+{{- end }}
 {{- end }}
 
 {{/*

@@ -81,6 +81,9 @@ affinity: {}
 ## @param localDomain Domain name (without the protocol) for your instance, used to identify it on the Fediverse (cannot be changed later)
 # localDomain: "example.com"
 
+## @param singleUserMode Whether to run the instance as a single user instance
+singleUserMode: false
+
 ## @param existingSecret Name of the secret to use for storing the Mastodon secrets (if it doesn't exist it will be created)
 # existingSecret: "my-secret"
 
@@ -109,6 +112,22 @@ postgres:
   # secretKeyRef: 
   #   name: "my-psql-secret"
   #   key: "postgres-password"
+
+  ## @param smtp SMTP parameters
+  ## @param smtp.enabled Whether to configure e-mail sending
+  ## @param smtp.host SMTP server
+  ## @param smtp.port SMTP port
+  ## @param smtp.fromAddress Value to use for the from field
+  ## @param smtp.secretKeyRef Secret storing the password
+smtp:
+  enabled: true
+  # host: "smtp.example.com"
+  port: 587
+  # fromAddress: "notification@example.com"
+  # user: "alice"
+  # secretKeyRef:
+  #   name: "my-smtp-secret"
+  #   key: "mailgun-password"
 
 ## @section Storage parameters
 ##

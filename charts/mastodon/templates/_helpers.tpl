@@ -81,6 +81,6 @@ Name of the redis secret
 {{- if .Values.redis.auth.existingSecret }}
 {{- .Values.redis.auth.existingSecret }}
 {{- else }}
-{{- printf "%s-redis-secret" (include "mastodon-standalone.fullname" .)}}
+{{- printf "%s-redis" (include "mastodon-standalone.fullname" .)}}
 {{- end }}
 {{- end }}
