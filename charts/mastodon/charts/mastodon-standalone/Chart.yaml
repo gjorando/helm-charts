@@ -2,7 +2,7 @@ apiVersion: v2
 name: mastodon-standalone
 type: application
 version: "0.1.0-dev"  # Should match the version of mastodon
-appVersion: "v4.2.11"
+appVersion: "v4.2.12"
 kubeVersion: ">= 1.30"  # FIXME review the functionalities of the chart and update accordingly
 description: Standalone chart for deploying the core mastodon codebase
 icon: https://raw.githubusercontent.com/mastodon/mastodon/main/lib/assets/wordmark.dark.png

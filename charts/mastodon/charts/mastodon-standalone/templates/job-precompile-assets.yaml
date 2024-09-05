@@ -1,0 +1,53 @@
+{{- define "mastodon-standalone.job.precompileAssetsName" -}}
+{{- printf "%s-precompile-assets" (include "mastodon-standalone.fullname" .) }}
+{{- end}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mastodon-standalone.job.precompileAssetsName" . | quote }}
+  labels: {{ include "mastodon-standalone.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: "post-install,post-upgrade"
+    helm.sh/hook-weight: "-10"
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      name: {{ include "mastodon-standalone.job.precompileAssetsName" . | quote }}
+      labels: {{ include "mastodon-standalone.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      restartPolicy: "Never"
+      containers: 
+      - name: {{ include "mastodon-standalone.job.precompileAssetsName" . | quote }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: {{ include "mastodon-standalone.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - |
+          bundle exec rake assets:precompile
+          EXIT_VALUE=$?
+          yarn cache clean
+          exit $EXIT_VALUE
+        volumeMounts:
+        {{- include "mastodon-standalone.dataVolumeMounts" . | nindent 8 }}
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "mastodon-standalone.env.containersSnippet" . | nindent 8 }}
+      volumes:
+      {{- include "mastodon-standalone.dataVolumes" . | nindent 6 }}
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}

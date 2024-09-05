@@ -95,14 +95,14 @@ Data volumes FIXME use a template deployment instead
 - name: "assets"
   {{- if .Values.persistence.enabled }}
   persistentVolumeClaim:
-  claimName: {{ include "mastodon-standalone.pvc.assets" . | quote }}
+    claimName: {{ include "mastodon-standalone.pvc.assets" . | quote }}
   {{- else }}
   emptyDir: {}
   {{- end }}
 - name: "system"
   {{- if .Values.persistence.enabled }}
   persistentVolumeClaim:
-  claimName: {{ include "mastodon-standalone.pvc.system" . | quote }}
+    claimName: {{ include "mastodon-standalone.pvc.system" . | quote }}
   {{- else }}
   emptyDir: {}
   {{- end }}
@@ -125,6 +125,8 @@ Environment values for the deployed containers
 envFrom:
 - configMapRef:
     name: {{ include "mastodon-standalone.env.configMapName" . | quote }}
+- secretRef:
+    name: {{ include "mastodon-standalone.secretName" . | quote }}
 env: 
 {{- if .Values.redis.secretKeyRef }}
 - name: "REDIS_PASSWORD"
@@ -136,7 +138,7 @@ env:
 - name: "DB_PASS"
   valueFrom:
     secretKeyRef:
-      {{- toYaml .Values.postgres.secretKeyRef | nindent 6 }}
+      {{- include "mastodon-standalone.postgres.secretKeyRef" . | nindent 6 }}
 {{- end }}
 {{- if .Values.smtp.enabled }}
 - name: "SMTP_PASSWORD"
@@ -181,6 +183,29 @@ Name of the secret
 {{- .Values.existingSecret }}
 {{- else }}
 {{- printf "%s-secret" (include "mastodon-standalone.fullname" .)}}
+{{- end }}
+{{- end }}
+
+{{/*
+Name of the redis host
+*/}}
+{{- define "mastodon-standalone.redis.host" -}}
+{{- required "Please provide the Redis instance hostname" .Values.redis.host }}
+{{- end }}
+
+{{/*
+Name of the postgres host
+*/}}
+{{- define "mastodon-standalone.postgres.host" -}}
+{{- required "Please provide the database hostname" .Values.postgres.host }}
+{{- end }}
+
+{{/*
+secretKeyRef for postgres
+*/}}
+{{- define "mastodon-standalone.postgres.secretKeyRef" -}}
+{{- with .Values.postgres.secretKeyRef }}
+{{- toYaml . }}
 {{- end }}
 {{- end }}
 

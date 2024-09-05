@@ -48,16 +48,17 @@ spec:
         - bundle
         - exec
         - sidekiq
-        readinessProbe:
-          exec:
-            command:
-            - cat
-            - /opt/mastodon/tmp/sidekiq_process_has_started_and_will_begin_processing_jobs
-          initialDelaySeconds: 10
-          failureThreshold: 10
-          periodSeconds: 2
-          successThreshold: 1
-          timeoutSeconds: 1
+        # FIXME when Mastodon 4.3 is released
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #     - cat
+        #     - /opt/mastodon/tmp/sidekiq_process_has_started_and_will_begin_processing_jobs
+        #   initialDelaySeconds: 10
+        #   failureThreshold: 10
+        #   periodSeconds: 2
+        #   successThreshold: 1
+        #   timeoutSeconds: 1
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:

@@ -84,6 +84,10 @@ affinity: {}
 ## @param singleUserMode Whether to run the instance as a single user instance
 singleUserMode: false
 
+## @param trustedProxyIp List of trusted reverse proxy IPs; if your network subnet isn't one of Mastodon's defaults, you may want to add it to this list
+# trustedProxyIp:
+# - "10.244.0.0/24"
+
 ## @param existingSecret Name of the secret to use for storing the Mastodon secrets (if it doesn't exist it will be created)
 # existingSecret: "my-secret"
 

@@ -13,21 +13,13 @@ tags:
 ## @param commonLabels Labels to add to all deployed objects (FIXME not on the PostgresCluster though)
 commonLabels: {}
 
-## @section Mastodon dependency
-##
-
-mastodon-standalone:
-  enabled: false
-  localDomain: "k8s-helm-dev.intensifi.es"
-  singleUserMode: true
-
 ## @section Optional dependencies
 ##
 
 # pgo optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/installation/helm)
 pgo:
   # pgo.enabled enables the deployment of the operator itself
-  # enabled: false
+  # enabled: true
   # pgo.singleNamespace is set to true to only watch the installation namespace
   singleNamespace: true
   # pgo.debug is set to false to disable pgo debug logging
@@ -36,27 +28,49 @@ pgo:
 # postgrescluster optional dependency options (see: https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials/basic-setup/create-cluster#use-helm-to-create-a-postgres-cluster)
 postgrescluster:
   # postgrescluster.enabled enables the deployment of a Postgres cluster using PGO
-  # enabled: false
+  # enabled: true
+
   # postgrescluster.databaseInitSQL points to a configuration file that bootstraps the database by creating a user schema for the mastodon database (see: https://www.crunchydata.com/blog/be-ready-public-schema-changes-in-postgres-15)
   databaseInitSQL:
     name: "postgrescluster-bootstrap-config"
     key: "bootstrap.sql"
   # users creates a mastodon user and its associated database (you should not create more than one user/one database for the user)
   users:
-  - name: mastodon
+  - name: &databaseUsername "mastodon"
     databases:
-    - mastodon
+    - &databaseName "mastodon"
 
 # redis optional dependency options (see: https://artifacthub.io/packages/helm/bitnami/redis)
 redis:
   # redis.enabled enables the deployment of a Redis instance
-  # enabled: false
+  # enabled: true
  
   # redis.architecture with the standalone value deploys a simple Redis master stateful set, without any Redis replica stateful sets
-  architecture: standalone
+  architecture: "standalone"
 
   # redis.auth enables password authentication, using a secret named redis-secret
   auth:
     usePassword: true
     usePasswordFile: true
-    existingSecret: "redis-secret"
+    existingSecret: &redisSecret "redis-secret"
+
+## @section Mastodon dependency
+##
+
+# mastodon main dependency options (see: https://github.com/gjorando/helm-charts/blob/main/charts/mastodon/charts/mastodon-standalone/README.md)
+mastodon-standalone:
+  # Automatically set the redis configuration; the host is programmatically computed assuming the redis subchart is enabled
+  redis:
+    secretKeyRef:
+      name: *redisSecret
+      key: "redis-password"
+
+  # Automatically set the postgres configuration; the host is programmatically computed assuming the postgrescluster subchart is enabled
+  postgres:
+    name: *databaseName
+    user: *databaseUsername
+
+    # These values are programmatically computed as well, but an empty definition needs to be present for the template redefinition to work
+    secretKeyRef: 
+      name: ""
+      key: ""

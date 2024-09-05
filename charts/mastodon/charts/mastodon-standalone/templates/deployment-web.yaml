@@ -58,10 +58,16 @@ spec:
           httpGet:
             path: /
             port: http
+            httpHeaders:
+            - name: "Host"
+              value: {{ printf "%s:3000" .Values.localDomain | quote }}
         readinessProbe:
           httpGet:
             path: /
             port: http
+            httpHeaders:
+            - name: "Host"
+              value: {{ printf "%s:3000" .Values.localDomain | quote }}
         startupProbe:
           httpGet:
             path: /health

@@ -1,0 +1,47 @@
+{{- define "mastodon-standalone.job.migrateDbName" -}}
+{{- printf "%s-migrate-db" (include "mastodon-standalone.fullname" .) }}
+{{- end}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mastodon-standalone.job.migrateDbName" . | quote }}
+  labels: {{ include "mastodon-standalone.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: "post-install,pre-upgrade"
+    helm.sh/hook-weight: "-10"
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      name: {{ include "mastodon-standalone.job.migrateDbName" . | quote }}
+      labels: {{ include "mastodon-standalone.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      restartPolicy: "Never"
+      containers: 
+      - name: {{ include "mastodon-standalone.job.migrateDbName" . | quote }}
+        image: {{ include "mastodon-standalone.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - bundle
+        - exec
+        - rake
+        - "db:migrate"
+        volumeMounts:
+        {{- include "mastodon-standalone.dataVolumeMounts" . | nindent 8 }}
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "mastodon-standalone.env.containersSnippet" . | nindent 8 }}
+      volumes:
+      {{- include "mastodon-standalone.dataVolumes" . | nindent 6 }}
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}

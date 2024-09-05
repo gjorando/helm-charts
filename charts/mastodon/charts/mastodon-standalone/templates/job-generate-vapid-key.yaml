@@ -23,11 +23,19 @@ spec:
       name: {{ include "mastodon-standalone.job.generateVapidKeyName" . | quote }}
       labels: {{ include "mastodon-standalone.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . | quote }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mastodon-standalone.serviceAccountName" . }}
       automountServiceAccountToken: true
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       restartPolicy: "Never"
       containers: 
       - name: {{ include "mastodon-standalone.job.generateVapidKeyName" . | quote }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
         image: {{ include "mastodon-standalone.image" . | quote }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:

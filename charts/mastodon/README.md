@@ -45,6 +45,14 @@ The following sections list all the optional dependencies and the value override
 
 This subchart deploys the actual Mastodon instance. Check [its documentation](charts/mastodon-standalone/README.md) for more details about configuring the chart.
 
+The table below lists our own configuration overrides for the `mastodon-standalone`dependency.
+  
+
+| Overridden value | Reason | Override |
+|---|---|---|
+| `redis` | Automatic configuration of the hostname and secret key assuming the redis subchart is enabled. Update these options if you don't use the redis subchart. | See [`values.yaml`](values.yaml); `redis.host` is programmatically redefined in [`_helpers.tpl`](templates/helpers.tpl) to match the service name of the redis subchart. | 
+| `postgres` | Automatic configuration of the hostname, db name and username, and secret key, assuming the postgrescluster subchart is enabled. Update these options if you don't use the postgrescluster subchart. | See [`values.yaml`](values.yaml); `postgres.host` is programmatically redefined in [`_helpers.tpl`](templates/helpers.tpl) to match the service name used by the postgres cluster. | 
+
 ### Postgres with PGO
 
 [PGO](https://github.com/CrunchyData/postgres-operator) is the operator for [Crunchy Postgres](https://www.crunchydata.com/products/crunchy-postgresql-for-kubernetes), a Kubernetes native Postgres solution. The default installation deploys the operator in the release namespace and setups a Crunchy Postgres instance.

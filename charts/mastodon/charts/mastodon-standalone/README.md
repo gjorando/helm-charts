@@ -53,7 +53,9 @@ Your `values.yaml` file should at the bare minimum define the keys that are outl
 | Parameter  | Description | Default |
 |---|---|---|
 | **`localDomain`** | Domain name (without the protocol part) of your instance. It is used as a unique identifier on the Fediverse, and cannot be changed once your instance is created. | REQUIRED |
+| `singleUserMode` | If `true`, registrations are disabled and the front page redirects to the first profile in the database. | `false` |
 | _`existingSecret`_ | Mastodon secrets of your instance. The data keys refer to the environment variables in a `env.production` file. See [`secret.yaml`](templates/secret.yaml) for the full list of secrets. | Unset (a new secret is created with generated random values) |
+| `trustedProxyIp` | List of trusted reverse proxy IP (CIDR format possible). If your Kubernetes pod network isn't in the default list of address ranges defined by Mastodon, you may want to add it here. See [the documentation](https://docs.joinmastodon.org/admin/config/#trusted_proxy_ip) for more details. | Unset |
 
 ### Redis
 

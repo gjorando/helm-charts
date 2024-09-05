@@ -42,5 +42,4 @@ dependencies:
   # Required to match the same version for mastodon and mastodon-standalone
   - name: mastodon-standalone
     version: "0.1.0-dev"
-    condition: mastodon-standalone.enabled
 home: https://joinmastodon.org
