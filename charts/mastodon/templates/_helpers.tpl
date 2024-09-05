@@ -98,7 +98,7 @@ Name of the postgres host; overrides the named template from mastodon-standalone
 FIXME this only works if we don't change the cluster name in the metachart configuration, or if we update the mastodon-standalone.postgres.host value accordingly
 */}}
 {{- define "mastodon-standalone.postgres.host" -}}
-{{- default (printf "%s-primary" .Release.Name) .Values.postgres.host }}
+{{- default (printf "%s-primary.%s.svc" .Release.Name .Release.Namespace) .Values.postgres.host }}
 {{- end }}
 
 {{/*

@@ -34,11 +34,19 @@ postgrescluster:
   databaseInitSQL:
     name: "postgrescluster-bootstrap-config"
     key: "bootstrap.sql"
-  # users creates a mastodon user and its associated database (you should not create more than one user/one database for the user)
+
+  # postgrescluster.users creates a mastodon user and its associated database (you should not create more than one user/one database for the user)
   users:
   - name: &databaseUsername "mastodon"
     databases:
     - &databaseName "mastodon"
+
+  # postgrescluster.patroni adds a pg_hba entry to the patroni configuration to allow connection to the database without SSL (FIXME)
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        pg_hba:
+        - "hostnossl all all all md5"
 
 # redis optional dependency options (see: https://artifacthub.io/packages/helm/bitnami/redis)
 redis:
