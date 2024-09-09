@@ -1,4 +1,12 @@
 {{/*
+Basic inline values
+*/}}
+
+
+
+{{/* GENERAL VALUES */}}
+
+{{/*
 Expand the name of the chart.
 */}}
 {{- define "mastodon-standalone.name" -}}
@@ -30,38 +38,12 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{/*
-Common labels applied to every object
-*/}}
-{{- define "mastodon-standalone.commonLabels" -}}
-{{- if .Values.commonLabels }}
-{{ .Values.commonLabels | toYaml }}
-{{- end }}
-{{- end }}
+
+
+{{/* MANIFEST NAMES */}}
 
 {{/*
-Common labels, including selector labels, version identifier and helm related labels
-*/}}
-{{- define "mastodon-standalone.labels" -}}
-helm.sh/chart: {{ include "mastodon-standalone.chart" . | quote }}
-{{ include "mastodon-standalone.selectorLabels" . }}
-{{- include "mastodon-standalone.commonLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "mastodon-standalone.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "mastodon-standalone.name" . | quote }}
-app.kubernetes.io/instance: {{ .Release.Name | quote }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
+Name of the service account.
 */}}
 {{- define "mastodon-standalone.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -72,113 +54,80 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Rolling pod annotations
+Name of the sidekiq deployment
 */}}
-{{- define "mastodon-standalone.rollingPodAnnotations" -}}
-rollme: {{ randAlphaNum 5 | quote }}
-{{- /* TODO add secrets checksums here, and add to the common pod labels of mastodon megachart the checksums for the redis secrets
-checksum/config-secrets: {{ include ( print $.Template.BasePath "/secrets.yaml" ) . | sha256sum | quote }}
-*/}}
+{{- define "mastodon-standalone.sidekiq.deploymentName" -}}
+{{ printf "%s-sidekiq" (include "mastodon-standalone.fullname" .) }}
 {{- end }}
 
 {{/*
-Full image path with tag
+Name of the streaming deployment
 */}}
-{{- define "mastodon-standalone.image" -}}
-{{- printf "%s:%s" .Values.image.repository (default .Chart.AppVersion .Values.image.tag) }}
+{{- define "mastodon-standalone.streaming.deploymentName" -}}
+{{ printf "%s-streaming" (include "mastodon-standalone.fullname" .) }}
 {{- end }}
 
 {{/*
-Data volumes FIXME use a template deployment instead
+Name of the web deployment
 */}}
-{{- define "mastodon-standalone.dataVolumes" -}}
-- name: "assets"
-  {{- if .Values.persistence.enabled }}
-  persistentVolumeClaim:
-    claimName: {{ include "mastodon-standalone.pvc.assets" . | quote }}
-  {{- else }}
-  emptyDir: {}
-  {{- end }}
-- name: "system"
-  {{- if .Values.persistence.enabled }}
-  persistentVolumeClaim:
-    claimName: {{ include "mastodon-standalone.pvc.system" . | quote }}
-  {{- else }}
-  emptyDir: {}
-  {{- end }}
+{{- define "mastodon-standalone.web.deploymentName" -}}
+{{ printf "%s-web" (include "mastodon-standalone.fullname" .) }}
 {{- end }}
 
 {{/*
-Data volume mounts
+Name of the claim for the assets volume.
 */}}
-{{- define "mastodon-standalone.dataVolumeMounts" -}}
-- name: assets
-  mountPath: /opt/mastodon/public/assets
-- name: system
-  mountPath: /opt/mastodon/public/system
-{{- end }}
-
-{{/*
-Environment values for the deployed containers
-*/}}
-{{- define "mastodon-standalone.env.containersSnippet" -}}
-envFrom:
-- configMapRef:
-    name: {{ include "mastodon-standalone.env.configMapName" . | quote }}
-- secretRef:
-    name: {{ include "mastodon-standalone.secretName" . | quote }}
-env: 
-{{- if .Values.redis.secretKeyRef }}
-- name: "REDIS_PASSWORD"
-  valueFrom:
-    secretKeyRef:
-      {{- toYaml .Values.redis.secretKeyRef | nindent 6 }}
-{{- end }}
-{{- if .Values.postgres.secretKeyRef }}
-- name: "DB_PASS"
-  valueFrom:
-    secretKeyRef:
-      {{- include "mastodon-standalone.postgres.secretKeyRef" . | nindent 6 }}
-{{- end }}
-{{- if .Values.smtp.enabled }}
-- name: "SMTP_PASSWORD"
-  valueFrom:
-    secretKeyRef:
-      {{- toYaml (required "Please provide a secret key reference for the SMTP password" .Values.smtp.secretKeyRef) | nindent 6 }}
-{{- end }}
-{{- end }}
-
-{{/*
-Names for each persistent volume claim
-*/}}
-
-{{- define "mastodon-standalone.pvc.assets" -}}
+{{- define "mastodon-standalone.persistence.assets.pvcName" -}}
 {{- if .Values.persistence.existingClaims.assets }}
 {{- .Values.persistence.existingClaims.assets }}
 {{- else }}
-{{- printf "%s-assets-volume" (include "mastodon-standalone.fullname" .)}}
-{{- end }}
-{{- end }}
-
-{{- define "mastodon-standalone.pvc.system" -}}
-{{- if .Values.persistence.existingClaims.system }}
-{{- .Values.persistence.existingClaims.system }}
-{{- else }}
-{{- printf "%s-system-volume" (include "mastodon-standalone.fullname" .) }}
+{{- printf "%s-assets" (include "mastodon-standalone.fullname" .)}}
 {{- end }}
 {{- end }}
 
 {{/*
-Name of the environment config map
+Name of the claim for the system volume.
+*/}}
+{{- define "mastodon-standalone.persistence.system.pvcName" -}}
+{{- if .Values.persistence.existingClaims.system }}
+{{- .Values.persistence.existingClaims.system }}
+{{- else }}
+{{- printf "%s-system" (include "mastodon-standalone.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Name of the job for precompiling assets.
+*/}}
+{{- define "mastodon-standalone.job.precompileAssetsName" -}}
+{{- printf "%s-precompile-assets" (include "mastodon-standalone.fullname" .) }}
+{{- end}}
+
+{{/*
+Name of the job for performing the database migrations.
+*/}}
+{{- define "mastodon-standalone.job.migrateDbName" -}}
+{{- printf "%s-migrate-db" (include "mastodon-standalone.fullname" .) }}
+{{- end}}
+
+{{/*
+Name of the job for generating the vapid key pair.
+*/}}
+{{- define "mastodon-standalone.job.generateVapidKeyName" -}}
+{{- printf "%s-generate-vapid-key" (include "mastodon-standalone.fullname" .) }}
+{{- end}}
+
+{{/*
+Name of the config map for the environment variables.
 */}}
 {{- define "mastodon-standalone.env.configMapName" -}}
 {{ printf "%s-env" (include "mastodon-standalone.fullname" .)}}
 {{- end }}
 
 {{/*
-Name of the secret
+Name of the secret.
 */}}
-{{- define "mastodon-standalone.secretName" -}}
+{{- define "mastodon-standalone.env.secretName" -}}
 {{- if .Values.existingSecret }}
 {{- .Values.existingSecret }}
 {{- else }}
@@ -186,41 +135,27 @@ Name of the secret
 {{- end }}
 {{- end }}
 
+
+
+{{/* VARIOUS RESOURCE NAMES */}}
+
 {{/*
-Name of the redis host
+Full image path with tag.
+*/}}
+{{- define "mastodon-standalone.image" -}}
+{{- printf "%s:%s" .Values.image.repository (default .Chart.AppVersion .Values.image.tag) }}
+{{- end }}
+
+{{/*
+Name of the redis host.
 */}}
 {{- define "mastodon-standalone.redis.host" -}}
 {{- required "Please provide the Redis instance hostname" .Values.redis.host }}
 {{- end }}
 
 {{/*
-Name of the postgres host
+Name of the postgres host.
 */}}
 {{- define "mastodon-standalone.postgres.host" -}}
 {{- required "Please provide the database hostname" .Values.postgres.host }}
 {{- end }}
-
-{{/*
-secretKeyRef for postgres
-*/}}
-{{- define "mastodon-standalone.postgres.secretKeyRef" -}}
-{{- with .Values.postgres.secretKeyRef }}
-{{- toYaml . }}
-{{- end }}
-{{- end }}
-
-{{/*
-A small helper function to generate an hexadecimal secret of given length.
-
-Process:
-- Generate a random ASCII string of length ceil(targetLength/2) (ie. generate ceil(targetLength/2) random bytes)
-- Display as hexadecimal; as a byte is written with two hexadecimal digits, we have an output of size 2*ceil(targetLength/2).
-- This means that for odd numbers we have one byte excedent. So we just limit the size of our output to $length, and voilà!
-*/}}
-{{- define "mastodon-standalone.randHex" -}}
-{{- $length := . }}
-{{- if or (not (kindIs "int" $length)) (le $length 0) }}
-{{- printf "mastodon-standalone.randHex expects a positive integer (%d passed)" $length | fail }}
-{{- end}}
-{{- printf "%x" (randAscii (divf $length 2 | ceil | int)) | trunc $length }}
-{{- end}}

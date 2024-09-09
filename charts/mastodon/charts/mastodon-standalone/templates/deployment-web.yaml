@@ -1,12 +1,8 @@
-{{- define "mastodon-standalone.web.labels" -}}
-app.kubernetes.io/component: web
-app.kubernetes.io/part-of: rails
-{{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ printf "%s-web" (include "mastodon-standalone.fullname" .) | quote }}
+  name: {{ include "mastodon-standalone.web.deploymentName" . | quote }}
   labels:
     {{- include "mastodon-standalone.labels" . | nindent 4 }}
     {{- include "mastodon-standalone.web.labels" . | nindent 4 }}
@@ -78,13 +74,13 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
-        {{- include "mastodon-standalone.dataVolumeMounts" . | nindent 8 }}
+        {{- include "mastodon-standalone.persistence.volumeMounts" . | nindent 8 }}
         {{- with .Values.volumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- include "mastodon-standalone.env.containersSnippet" . | nindent 8 }}
+        {{- include "mastodon-standalone.env.snippet" . | nindent 8 }}
       volumes:
-      {{- include "mastodon-standalone.dataVolumes" . | nindent 6 }}
+      {{- include "mastodon-standalone.persistence.volumes" . | nindent 6 }}
       {{- with .Values.volumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}

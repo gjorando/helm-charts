@@ -1,12 +1,8 @@
-{{- define "mastodon-standalone.streaming.labels" -}}
-app.kubernetes.io/component: streaming
-app.kubernetes.io/part-of: node
-{{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ printf "%s-streaming" (include "mastodon-standalone.fullname" .) | quote }}
+  name: {{ include "mastodon-standalone.streaming.deploymentName" . | quote }}
   labels:
     {{- include "mastodon-standalone.labels" . | nindent 4 }}
     {{- include "mastodon-standalone.streaming.labels" . | nindent 4 }}
@@ -72,7 +68,7 @@ spec:
         volumeMounts:
           {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- include "mastodon-standalone.env.containersSnippet" . | nindent 8 }}
+        {{- include "mastodon-standalone.env.snippet" . | nindent 8 }}
       {{- with .Values.volumes }}
       volumes:
       {{- toYaml . | nindent 6 }}
